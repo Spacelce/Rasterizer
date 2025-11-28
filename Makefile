@@ -1,15 +1,21 @@
 CC = g++
-CFLAGS = -std=c++11 -Wall
-LIBS = -lGL -lGLU -lglut -lGLEW
+CFLAGS = -std=c++11 -Wall -Iinclude -Ilibs/glad/include
+LIBS = -lglfw -lGL -ldl
+GLAD_SRC = libs/glad/src/glad.c
 TARGET = Mainer
+BIN_DIR = bin
+SRC_DIR = src/main
 
-all: $(TARGET)
+all: $(BIN_DIR) $(BIN_DIR)/$(TARGET)
 
-$(TARGET): ./src/main/Mainer.cpp
-	$(CC) $(CFLAGS) -o $(TARGET) ./src/main/Mainer.cpp $(LIBS)
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
+$(BIN_DIR)/$(TARGET): $(SRC_DIR)/Mainer.cpp
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(TARGET) $(SRC_DIR)/Mainer.cpp $(GLAD_SRC) $(LIBS)
 
 clean:
-	rm -f $(TARGET)
+	rm -rf $(BIN_DIR)/*
 
 run: all
-	./bin/$(TARGET)
+	./$(BIN_DIR)/$(TARGET)
