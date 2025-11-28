@@ -1,19 +1,45 @@
+#include <cmath>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+// Vertex Shader source code
+const char* vertexShaderSource = R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+
+void main()
+{
+    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+}
+)";
+
+// Fragment Shader source code
+const char* fragmentShaderSource = R"(
+#version 330 core
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);
+}
+)";
+
 int main(int argc, char** argv) {
-    // Initialize GLFW
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
     }
 
-    // Configure GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    GLfloat vertices[] = {
+        -0.5f, -0.5f / float(sqrt(3)), 0.0f, // lower left corner
+         0.5f, -0.5f / float(sqrt(3)), 0.0f, // lower right corner
+         0.0f,  0.5f / float(sqrt(3)) * 2 , 0.0f // upper corner
+    };
     // Create window
     GLFWwindow* window = glfwCreateWindow(800, 600, "Rasterizer", NULL, NULL);
     if (window == NULL) {
@@ -23,25 +49,87 @@ int main(int argc, char** argv) {
     }
     glfwMakeContextCurrent(window);
 
-    // Load OpenGL functions with GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+    
+    glViewport(0, 0, 800, 800); 
+    /* Create Vertex Shader Object and get reference,
+       then attach vertex shader source to vertex shader obect
+       compile the vertex shader into machine code*/
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
 
-    std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
 
-    // Main loop
+    GLuint shaderProgram = glCreateProgram();
+
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    // Wrap up/ links all the shaders into the shader program
+    glLinkProgram(shaderProgram);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    // Set up vertex data (vertex array and vertex buffer objects)
+    // buffers, and configure vertex attributes
+    GLuint VBO, VAO;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Configure vertex attributes so that OpenGL knows to read the VBO 
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Bind both the VBO and VAO to 0 to prevent accidentallly modify
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+
+
+
+    /* Adds color to bg, cleans back buffer and assigns the color,
+    *  finally swaps back buffer and front buffer*/
+
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    glfwSwapBuffers(window);
+    
     while (!glfwWindowShouldClose(window)) {
-        // Clear screen
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        // Swap buffers and poll events
+        // Tell OPENGL to use the shader program
+        glUseProgram(shaderProgram);
+        // Bind the VAO
+        glBindVertexArray(VAO);
+        // Draw the triangle
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         glfwSwapBuffers(window);
+
+
         glfwPollEvents();
     }
 
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(shaderProgram);
+
+
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }
