@@ -18,6 +18,7 @@ class Shader
         Shader(const char* vertexFile, const char* fragmentFile);
         void Activate();
         void Delete();
+        void compileErrors(unsigned int shader, const char* type);
 };
 
 #endif
