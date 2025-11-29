@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++11 -Wall -Iinclude -Ilibs/glad/include
+CFLAGS = -std=c++11 -Wall -Iheader -Ilibs/glad/include
 LIBS = -lglfw -lGL -ldl
 GLAD_SRC = libs/glad/src/glad.c
 TARGET = Main

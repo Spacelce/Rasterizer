@@ -1,12 +1,12 @@
 [
   {
     "directory": "/home/clarence/Projets/Rasterizer",
-    "command": "g++ -std=c++11 -Wall -I./include -I./libs/glad/include -o bin/Mainer src/main/Mainer.cpp libs/glad/src/glad.c -lglfw -lGL -ldl",
-    "file": "src/main/Mainer.cpp"
+    "command": "g++ -std=c++11 -Wall -I./header -I./libs/glad/include -o bin/Main src/main/Main.cpp libs/glad/src/glad.c -lglfw -lGL -ldl",
+    "file": "src/main/Main.cpp"
   },
   {
     "directory": "/home/clarence/Projets/Rasterizer",
-    "command": "g++ -std=c++11 -Wall -I./include -I./libs/glad/include -c libs/glad/src/glad.c",
+    "command": "g++ -std=c++11 -Wall -I./header -I./libs/glad/include -c libs/glad/src/glad.c",
     "file": "libs/glad/src/glad.c"
   }
 ]
