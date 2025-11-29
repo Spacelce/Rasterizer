@@ -55,7 +55,9 @@ int main(int argc, char** argv) {
        then attach vertex shader source to vertex shader obect
        compile the vertex shader into machine code*/
     
-    Shader shaderProgram("default.vert", "default.frag");
+    Shader shaderProgram(
+        "resource_files/Shaders/default.vert", 
+        "resource_files/Shaders/default.frag");
 
     VAO VAO1;
     VAO1.Bind();
